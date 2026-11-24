@@ -1,519 +1,218 @@
-# Currency Converter — Detailed Project Walkthrough
+# Currency Converter — Lecture Walkthrough
 
-These notes follow the Currency Converter mini-project in the supplied Fetch API lesson. The walkthrough combines HTML, CSS, DOM selection, arrays/objects, event listeners, Fetch, JSON parsing, and exchange-rate arithmetic.
+**Source:** “Last Lecture: Fetch API with Project | JavaScript Full Course” by Shradha Khapra.  
+**Transcript:** auto-dubbed Hindi transcript supplied in this conversation.
 
-> The transcript refers to a downloadable country/currency list and a sample exchange-rate API. It does not provide a complete reusable copy of every source file or guarantee that the sample API remains available. The examples below explain the structure and mark API-specific details clearly.
+This follows the instructor's project sequence. The narration is used as the source; where the auto-dubbed transcript does not preserve an exact URL or code token, the note says so instead of inventing one.
 
-## 1. What are we building?
+## 1. What the project does (32:14–32:55)
 
-A small page where a user can:
-1. enter an amount;
-2. choose a currency in the **From** dropdown;
-3. choose a currency in the **To** dropdown;
-4. click **Get Exchange Rate**;
-5. see the converted amount.
+The project converts an amount from one currency to another. The instructor's example is converting US dollars (USD) to Indian rupees (INR). The app needs an exchange rate to calculate the converted amount.
 
-The lesson begins with a USD → INR default example, then tests other currencies such as EUR, AUD, JPY, and NPR.
+## 2. HTML page and form (32:55–39:36)
 
-## 2. Project files
+The instructor creates an HTML page titled **Currency Converter** and links a `style.css` file.
 
-The lesson creates an HTML page titled **Currency Converter** and links a CSS stylesheet. A typical organization is:
+The page is built in this order:
 
-```text
-currency-converter/
-├── index.html
-├── style.css
-└── app.js
-```
-
-- `index.html`: page structure (amount input, two selects, flags, button, result message).
-- `style.css`: layout and appearance.
-- `app.js`: currency list, dropdown options, flag changes, Fetch request, and conversion.
-
-## 3. HTML structure
-
-The lesson builds the page in small pieces:
-
-1. A main `.container` div.
+1. A main `div` named/container class.
 2. An `h2` heading: Currency Converter.
 3. A `form`.
-4. An amount section with a label and input (initial example value: 100).
-5. A `.dropdown` section containing two currency selectors:
-   - From selector;
-   - To selector.
-6. Each selector is wrapped in a `.select-container` with a flag image and a `select` element.
-7. A result/message area, initially showing an example such as 1 USD = 80 INR.
-8. A button labelled **Get Exchange Rate**.
+4. An amount section with an “Enter Amount” label and an input. The initial value shown is 100.
+5. A dropdown section with two selects:
+   - **From** currency;
+   - **To** currency.
+6. The first select is initially shown with currency options such as USD and INR; EUR and AUD are added as examples.
+7. Each currency select has a country flag image beside it.
+8. A message area with an initial example like `1 USD = 80 INR`.
+9. A button labelled **Get Exchange Rate**.
 
-Example semantic skeleton (class names are illustrative; keep them consistent with your JavaScript selectors):
+The initial visible conversion is USD → INR. The flag images are static at this stage; the instructor says the dynamic flag logic will be added in JavaScript.
 
-```html
-<div class="container">
-  <h2>Currency Converter</h2>
+### Why the form submits
 
-  <form>
-    <div class="amount">
-      <p>Enter Amount</p>
-      <input class="amount-input" type="number" value="1" min="1">
-    </div>
+The instructor clicks the button and observes that a button inside a form acts as a submit button by default. The page/form submission causes the browser's default behavior. Later, the JavaScript handler prevents that default so the app can run its own conversion code.
 
-    <div class="dropdown">
-      <div class="select-container">
-        <p>From</p>
-        <img class="flag" src="..." alt="From country flag">
-        <select name="from" id="from"></select>
-      </div>
+## 3. Styling the layout (around 39:36–52:55)
 
-      <div class="select-container">
-        <p>To</p>
-        <img class="flag" src="..." alt="To country flag">
-        <select name="to" id="to"></select>
-      </div>
-    </div>
+The instructor styles the page step by step in the browser/editor. The visible decisions include:
 
-    <div class="message" aria-live="polite">Choose currencies to convert.</div>
-    <button type="submit">Get Exchange Rate</button>
-  </form>
-</div>
-```
+- center the converter on the page using flex layout;
+- use a page background and a contrasting converter/container background;
+- add padding and rounded corners to the container;
+- style the amount input and select controls with borders, spacing, and rounded corners;
+- place the From and To dropdowns next to each other;
+- size and position the flag images;
+- style the result/message spacing;
+- give the Get Exchange Rate button a height, background colour, white text, font size, and pointer cursor.
 
-The source lesson uses an input, two select elements, flag images, a message, and a form button. Adjust selectors in the JavaScript if you choose different class names or IDs.
+These are the styling steps shown in the lesson, not a claim that the short list reproduces every CSS declaration.
 
-## 4. Styling and layout decisions
+## 4. Add the country/currency data files (51:42–53:03)
 
-The lesson styles the page progressively rather than all at once.
+The instructor says the project uses two JavaScript files:
+- `codes.js` — a supplied list containing each currency code and its corresponding country code (the narration says the list contains about 160 entries);
+- `app.js` — where the project logic is written.
 
-### Page and main container
+The instructor notes that learners can either use the supplied country list or begin with a smaller list of a few currencies.
 
-- Reset the default margin and padding.
-- Use flexbox on the body to center the converter.
-- Center items horizontally and vertically.
-- Give the body a minimum height of 100 viewport height.
-- Apply a light background colour.
-- Give the main container an off-white/white background, padding, rounded corners, and a fixed/relative width and minimum height.
+Both scripts are linked in the HTML before the closing body tag, with `codes.js` included before `app.js` so the currency/country mapping is available to the app logic.
 
-### Form controls
+## 5. The APIs used (36:41–37:30 and 53:03–54:39)
 
-- Make the input, selects, and button fill the available form width where appropriate.
-- Remove the browser's default border and add a light border.
-- Add rounded corners.
-- Give the amount input a readable font size, height, and padding.
-- Use a flex row for the From and To sections so they appear on the same line.
-- Use `justify-content: space-between` and `align-items: center` to position the two currency controls.
-- Place the flag image and select next to each other using flexbox.
-- Give the flag a controlled width so it does not dominate the dropdown.
-- Add spacing around the message and button.
+Two kinds of external data are used:
 
-A simplified CSS sketch:
+- A flag-image service: the country code is placed in the image URL to display that country's flag. The instructor demonstrates changing the code to show India, the US, Nepal, and other flags.
+- A currency exchange-rate API: its documentation/README describes the available endpoints. The instructor opens an endpoint and shows that it returns an update date and an exchange rate. The example shown includes USD to INR, with a rate of about 83 and a displayed update date.
 
-```css
-/* Center the converter in the viewport. */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+The auto-dubbed transcript does not preserve the full literal URL reliably. The important narrated structure is a base URL plus the selected currency codes and the API's JSON endpoint format. Use the actual URL from the lesson's linked API documentation/code rather than treating a guessed URL as the source.
 
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: #f4e4eb;
-}
+## 6. Populate both currency dropdowns (54:39–59:18)
 
-.container {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 1rem;
-  width: min(90vw, 28rem);
-}
+The instructor selects the dropdown `select` elements using `document.querySelectorAll` and loops over them.
 
-form input,
-form select,
-form button {
-  width: 100%;
-  border: 1px solid lightgray;
-  border-radius: 0.75rem;
-}
+The supplied mapping contains:
+- a currency code (example: INR);
+- a country code (example: IN).
 
-.dropdown {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 2rem;
-}
+For each currency in the mapping:
+1. create a new `option` element;
+2. set its text/value to the currency code;
+3. append the option to the current select.
 
-.select-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
+This makes the full currency list appear in both dropdowns.
 
-.select-container img {
-  width: 2rem;
-}
+The instructor then sets the defaults:
+- the select named **from** should start with **USD** selected;
+- the select named **to** should start with **INR** selected.
 
-.message {
-  margin: 2rem 0;
-}
-```
+The selection is made by checking the select's name and the current currency code, then marking the matching option as selected.
 
-This is a compact illustration of the layout choices, not a pixel-perfect transcription of the lesson's full stylesheet.
+## 7. Change the flag when the currency changes (59:18–1:02:46)
 
-## 5. Currency codes and country flags
+The instructor creates an `updateFlag` function and adds a `change` event listener to each select.
 
-The lesson starts with a few hard-coded options (USD, INR, EUR, AUD), then explains that the supplied currency/country list contains roughly 160 entries. Each entry provides a currency code and a country code.
+The sequence is:
 
-Why keep both codes?
-- The **currency code** is used to request the exchange rate (for example, USD or INR).
-- The **country code** is used to show the matching flag image.
+1. The select changes.
+2. The event listener receives the event object.
+3. `event.target` identifies the select that changed.
+4. Read the selected currency code from the element's value.
+5. Look up that currency's country code in the supplied mapping.
+6. Build the flag image source using the country code.
+7. Find the image inside the select's parent container and update its `src`.
 
-A flag-image service can return a flag based on a country code. The lesson demonstrates changing the code in the flag URL to show different country flags. Do not assume currency code and country code are always identical; use the mapping supplied with the project data.
+The distinction matters: **currency code** is used for the exchange-rate request, while **country code** is used for the flag image.
 
-### Populate the dropdowns from a list
+## 8. Handle the Get Exchange Rate button (1:02:55–1:04:12)
 
-A common pattern is to loop over the currency list and create an `option` for each entry:
+The instructor selects the form button and adds an event listener. The form's default submission behavior is prevented so the page does not reload and the custom JavaScript conversion logic can run.
+
+The key browser behavior being addressed is the default submit behavior of a button inside a form.
+
+## 9. Read and validate the amount (1:04:12–1:05:47)
+
+The amount input element is selected from the DOM. The instructor first logs the element, then corrects the code to read its `.value`.
+
+The narration tests:
+- an ordinary amount;
+- an empty input;
+- a negative amount such as -5.
+
+The validation rule is: if the amount is empty or less than 1, set the amount to 1 and also update the input field to show 1.
+
+Reconstructed logic:
 
 ```js
-// Example shape only. Use the actual country/currency data file
-// supplied with the lesson or your own verified mapping.
-const countryList = {
-  USD: "US",
-  INR: "IN",
-  EUR: "EU",
-  AUD: "AU",
-  JPY: "JP",
-  NPR: "NP"
-};
+// Read the entered value from the input element.
+let amountValue = amountInput.value;
 
-const selects = document.querySelectorAll("select");
-
-for (const select of selects) {
-  for (const currencyCode in countryList) {
-    // Create one option for each currency code.
-    const option = document.createElement("option");
-
-    // The option's visible text and value are the currency code.
-    option.value = currencyCode;
-    option.textContent = currencyCode;
-
-    // Set the lesson's initial defaults: USD in From and INR in To.
-    if (select.name === "from" && currencyCode === "USD") {
-      option.selected = true;
-    }
-    if (select.name === "to" && currencyCode === "INR") {
-      option.selected = true;
-    }
-
-    select.append(option);
-  }
-
-  // Once the options are created, update this select's flag.
-  select.dispatchEvent(new Event("change"));
-}
-```
-
-The lesson's logic checks which dropdown is being populated (From or To) and marks USD or INR as selected initially. This gives the app a predictable starting conversion.
-
-## 6. Update the flag when a dropdown changes
-
-The lesson creates an `updateFlag` function and attaches a `change` event listener to each select.
-
-The event object is useful:
-- `event.target` is the select element that changed.
-- `event.target.value` is the selected currency code.
-- The selected element's parent container contains the related flag image.
-
-```js
-const updateFlag = (selectElement) => {
-  // Read the selected currency code (for example, "INR").
-  const currencyCode = selectElement.value;
-
-  // Look up the country code from the mapping.
-  const countryCode = countryList[currencyCode];
-
-  // Find the flag image next to this select.
-  const image = selectElement.parentElement.querySelector("img");
-
-  // Replace the image URL with the flag for the selected country.
-  image.src = `https://flagsapi.com/${countryCode}/flat/64.png`;
-};
-
-// Listen for changes on both dropdowns.
-document.querySelectorAll("select").forEach((select) => {
-  select.addEventListener("change", (event) => {
-    updateFlag(event.target);
-  });
-});
-```
-
-The lesson's sequence is: get the changed select → read its value → look up the country code → build the new flag source → find the image in the select's parent container → update `src`.
-
-If the selected option changes but the flag does not, inspect the mapping and the DOM relationship between the select and image.
-
-## 7. Stop the form from reloading the page
-
-The lesson observes that clicking a button inside a form submits the form by default. The browser then reloads/navigates, which interrupts the intended in-page interaction.
-
-Use the submit event and prevent the default browser action:
-
-```js
-const form = document.querySelector("form");
-
-form.addEventListener("submit", (event) => {
-  // Stop the browser's default form submission/reload.
-  event.preventDefault();
-
-  // Run our own conversion logic instead.
-  updateExchangeRate();
-});
-```
-
-This is important: the browser's default form behavior is not the conversion behavior. We prevent the reload and handle the submission ourselves.
-
-## 8. Read and validate the amount
-
-The lesson reads the amount input and then its `.value`.
-
-Remember:
-- `document.querySelector(...)` returns the HTML element.
-- `input.value` returns the text currently entered into that input.
-- Input values are strings, even when the user enters digits.
-
-The lesson handles an empty amount or a value less than 1 by resetting it to 1.
-
-```js
-const amountInput = document.querySelector(".amount input");
-
-let amount = amountInput.value;
-
-// Empty input or an amount below 1 is reset to 1.
-if (amount === "" || Number(amount) < 1) {
-  amount = 1;
+// The lesson resets an empty amount or a value below 1 to 1.
+if (amountValue === "" || amountValue < 1) {
+  amountValue = 1;
   amountInput.value = "1";
 }
-
-// Convert the input string into a number for multiplication.
-amount = Number(amount);
 ```
 
-Why the lesson's debugging mattered:
-- It initially logged the input element instead of the entered value.
-- The amount must come from `amount.value`.
-- Arithmetic should use a number, not the input element or an unconverted string.
+The instructor later catches a related mistake: the calculation needs the input's value, not the input DOM element itself.
 
-## 9. Build the exchange-rate endpoint
+## 10. Build the currency API request (around 1:05:47–1:08:55)
 
-When the user submits the form, read both selected currency codes:
+The instructor reads the selected From and To currencies, converts their codes to lowercase, and inserts them into the base URL to form the request URL.
+
+The narration describes the URL as the API base URL followed by the selected currency codes and a JSON suffix. Since the auto-dubbed transcript does not reliably preserve the complete URL, this is the structure—not a replacement literal endpoint:
 
 ```js
-const fromCurrency = document.querySelector("#from").value.toLowerCase();
-const toCurrency = document.querySelector("#to").value.toLowerCase();
+// Structural illustration of the URL construction described in the lesson.
+// Use the exact base URL and path from the API documentation linked in the video.
+const fromCurrency = fromSelect.value.toLowerCase();
+const toCurrency = toSelect.value.toLowerCase();
+const url = /* API base URL + fromCurrency + "/" + toCurrency + ".json" */;
 ```
 
-The lesson builds a URL from:
-- the API's base URL;
-- the selected **From** currency;
-- the selected **To** currency;
-- a JSON suffix.
+The instructor makes the request with Fetch and waits for the response. The console shows status **200**, indicating that the request worked.
 
-Illustrative endpoint pattern:
+## 11. Parse the response and get the rate (1:08:55–1:10:10)
+
+The response is parsed with `await response.json()`. The instructor logs the resulting data and accesses the exchange rate using the selected **To** currency's lowercase code as the key.
+
+The lesson tests different target currencies and reads example rates:
+- INR: about 83;
+- JPY: about 142;
+- AUD: about 1.49.
+
+The response structure is API-specific. The important point demonstrated is to inspect the returned data and use the target currency's key; do not assume a different nested structure.
+
+## 12. Calculate and display the conversion (1:10:10–1:13:45)
+
+The calculation is:
 
 ```js
-const BASE_URL = "https://example.com/latest/currencies";
-
-// The exact path format must match the API's documentation.
-const url = `${BASE_URL}/${fromCurrency}/${toCurrency}.json`;
+// Multiply the entered amount by the exchange rate returned by the API.
+const finalAmount = amount * rate;
 ```
 
-The source walkthrough describes removing a fixed currency suffix from the base URL and then inserting the selected From and To values. Treat the above as a pattern, not a guaranteed live endpoint. The actual API's documentation determines the exact URL.
+The instructor selects the message element and updates its `innerText` to show:
+- the entered amount;
+- the From currency;
+- the calculated amount;
+- the To currency.
 
-## 10. Fetch the rate and calculate the result
+During debugging, the instructor finds two mistakes:
+- using the amount input element instead of its value;
+- using an amount value that had not been correctly set/read.
 
-The lesson makes the exchange-rate function asynchronous because it uses `await`.
+After correcting these, the examples work. The lesson compares some results with online values and notes that the API's exchange rates are close but not perfectly up to date/accurate.
 
-```js
-const updateExchangeRate = async () => {
-  // 1. Read the amount entered by the user.
-  let amount = amountInput.value;
+## 13. Run the conversion when the page loads (1:13:45–1:15:37)
 
-  // 2. Use 1 if the field is empty or less than 1.
-  if (amount === "" || Number(amount) < 1) {
-    amount = 1;
-    amountInput.value = "1";
-  }
+The instructor changes the default amount from 100 to 1 to make the initial example simpler.
 
-  // 3. Read the selected currency codes.
-  const fromCurrency = fromSelect.value.toLowerCase();
-  const toCurrency = toSelect.value.toLowerCase();
+Then the instructor wants the default USD → INR conversion to appear as soon as the page loads. The conversion logic is placed in an `updateExchangeRate` function and the function is called from a load event listener.
 
-  // 4. Build the endpoint in the format required by your API.
-  const url = buildCurrencyEndpoint(fromCurrency, toCurrency);
+A debugging correction is shown: the event listener needs to be attached to **window** for the behavior demonstrated.
 
-  // 5. Fetch returns a Promise that resolves to a Response.
-  const response = await fetch(url);
-
-  // 6. Parse the JSON body (also asynchronous).
-  const data = await response.json();
-
-  // 7. Read the selected target currency's rate.
-  // This property path is API-specific; inspect the JSON first.
-  const rate = data[fromCurrency][toCurrency];
-
-  // 8. Convert the input to a number and multiply by the rate.
-  const finalAmount = Number(amount) * Number(rate);
-
-  // 9. Update the message shown in the page.
-  message.innerText =
-    `${amount} ${fromCurrency.toUpperCase()} = ${finalAmount} ${toCurrency.toUpperCase()}`;
-};
-```
-
-The lesson demonstrates the key arithmetic:
+Reconstructed event pattern:
 
 ```js
-finalAmount = amount * exchangeRate;
-```
-
-Example for understanding only: if the entered amount is 10 and the API rate says 1 USD = 83 INR, the result is 10 × 83 = 830 INR. The lesson's own sample rates are approximate and should not be treated as current financial data.
-
-### Why use lowercase currency codes?
-
-The lesson converts the selected From and To codes to lowercase before using them in the endpoint/property lookup. This is because the sample API's URL/JSON keys use lowercase codes. Always match the case expected by the API.
-
-### Why inspect the response before accessing the rate?
-
-The rate might be nested inside one or more objects. The property path `data[fromCurrency][toCurrency]` only works if the response actually has that shape. Log the parsed data and follow the real keys.
-
-## 11. Display the result
-
-The lesson selects the message element and changes its `innerText` to show:
-- entered amount;
-- From currency;
-- calculated amount;
-- To currency.
-
-```js
-const message = document.querySelector(".message");
-
-message.innerText =
-  `${amount} ${fromCurrency.toUpperCase()} = ${finalAmount} ${toCurrency.toUpperCase()}`;
-```
-
-Use `innerText` when you want to place ordinary text in the element.
-
-## 12. Run once when the page loads
-
-The lesson wants the default USD → INR conversion to appear without the user first clicking the button.
-
-It creates/uses an `updateExchangeRate` function and calls it on the window's load event:
-
-```js
+// Run the default conversion when the browser window finishes loading.
 window.addEventListener("load", () => {
-  // Show the default conversion as soon as the page is ready.
   updateExchangeRate();
 });
 ```
 
-The transcript notes a debugging correction: the load listener belongs on `window` for the behavior shown in the lesson.
+## 14. Final tests and lecture wrap-up (1:15:37–1:17:07)
 
-## 13. A more defensive version
-
-This example adds clear checks around the same lesson logic. Replace `buildCurrencyEndpoint` and the rate property path with the actual API's documented format.
-
-```js
-const updateExchangeRate = async () => {
-  try {
-    let amount = amountInput.value;
-
-    if (amount === "" || Number(amount) < 1) {
-      amount = "1";
-      amountInput.value = "1";
-    }
-
-    const fromCurrency = fromSelect.value.toLowerCase();
-    const toCurrency = toSelect.value.toLowerCase();
-    const url = buildCurrencyEndpoint(fromCurrency, toCurrency);
-
-    message.innerText = "Getting exchange rate...";
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const rate = data[fromCurrency][toCurrency];
-
-    if (rate === undefined || !Number.isFinite(Number(rate))) {
-      throw new Error("The API response did not contain a valid exchange rate.");
-    }
-
-    const result = Number(amount) * Number(rate);
-
-    message.innerText =
-      `${amount} ${fromCurrency.toUpperCase()} = ${result.toFixed(2)} ${toCurrency.toUpperCase()}`;
-  } catch (error) {
-    message.innerText = "Could not get the exchange rate. Please try again.";
-    console.error(error);
-  }
-};
-```
-
-This is an improved teaching example; the extra validation/error display is added for robustness, not claimed as exact lesson code.
-
-## 14. Debugging mistakes shown in the lesson
-
-| Problem | Why it happened | Fix |
-| --- | --- | --- |
-| Page reloads when button is clicked | A button inside a form submits the form by default | Listen for submit and call `event.preventDefault()` |
-| Flag does not update | The selected currency/country mapping or image selector is wrong | Inspect `event.target.value`, mapping, parent, and image |
-| Wrong currency rate | The wrong currency code or response property was used | Log JSON and inspect the exact nested keys |
-| “Final amount is not a number” | The code used an element/string instead of a numeric value | Read `input.value`, then convert with `Number()` |
-| Amount is empty or negative | User entered an invalid amount | Reset empty or values below 1 to 1, as in the lesson |
-| Default result is missing | Conversion only runs after clicking | Call the update function on window load |
-| Result differs from online converter | Sample API data may be approximate or stale | Check provider's update frequency and data accuracy |
-
-## 15. Test cases from the lesson's flow
-
-Try these combinations:
-- 1 USD → INR;
-- 1000 USD → INR;
-- 1000 INR → EUR;
+The instructor tests several conversions, including:
 - INR → NPR;
 - INR → JPY;
 - USD → JPY;
 - USD → AUD.
 
-The lesson compares a few sample results with online values and observes that the API's values are close but not perfectly current. That is a useful reminder: a working API integration does not automatically guarantee real-time or authoritative exchange-rate data.
+The basic converter is working. The instructor says the styling could be improved further, but the basic layout and mini-project are complete.
 
-## 16. Concepts revised by this project
+The lecture closes by connecting the project back to the JavaScript topics used: DOM, strings, arrays, and API calls.
 
-- **HTML:** form, input, select, option, image, button, div.
-- **CSS:** margin, padding, flexbox, alignment, width, border, border-radius, background.
-- **DOM:** `querySelector`, `querySelectorAll`, `createElement`, `append`, `parentElement`.
-- **Events:** `change`, `submit`, `load`, `event.target`, `preventDefault()`.
-- **Values and types:** `input.value`, strings, `Number()`.
-- **Objects:** mapping a currency code to a country code; reading nested response keys.
-- **Loops:** building many dropdown options from a currency list.
-- **Fetch and Promises:** `fetch()`, `await`, `response.json()`.
-- **Template literals:** dynamically building a URL and result message.
-- **Arithmetic:** amount × exchange rate.
+## Transcript-faithfulness note
 
-## 17. Practice tasks
-
-- [ ] Add another currency to the mapping and dropdown.
-- [ ] Verify that the correct flag appears for both dropdowns.
-- [ ] Make the result update when the amount changes.
-- [ ] Show a loading message while Fetch is running.
-- [ ] Handle a failed request and a missing exchange-rate key.
-- [ ] Prevent empty, zero, and negative amounts.
-- [ ] Format the final result to two decimal places.
-- [ ] Add a swap button that exchanges the From and To selections.
-- [ ] Compare the displayed rate with the provider's published rate and note the update timestamp.
-
-## Source and scope
-
-Based on the supplied transcript of *Last Lecture: Fetch API with Project | JavaScript Full Course* by Shradha Khapra. The source walks through the form layout and styling, currency dropdowns, a country/currency list, flag images, default USD-to-INR selection, change listeners, form submission prevention, amount validation, endpoint construction, Fetch/JSON parsing, nested rate lookup, multiplication, result text, and initial page-load conversion. Any API URL or response key shown as a placeholder here must be replaced with the exact details from the API documentation.
+The source is an auto-dubbed transcript, not the original `index.html`, `style.css`, `codes.js`, and `app.js` files. The snippets above reconstruct only the logic that is clearly narrated. Exact API URLs, full CSS, and some identifiers should be checked against the original code linked in the video description.
