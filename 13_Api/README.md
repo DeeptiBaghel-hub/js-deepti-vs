@@ -1,29 +1,30 @@
 # 13 — Fetch API
 
-Detailed study notes for the final Fetch API lesson in **JavaScript Full Course** by Shradha Khapra, based on the lesson transcript supplied for these notes.
+Transcript-based notes for **“Last Lecture: Fetch API with Project | JavaScript Full Course”** by Shradha Khapra.
 
-This folder is organized as a small study guide rather than one short summary.
+The source supplied for these notes is an auto-dubbed Hindi YouTube transcript. The notes follow the lecture's sequence and use timestamps so each topic can be checked against the video.
 
-## Notes
+## Files
 
-1. **[Fetch API — Detailed Notes](fetch-api-notes.md)**  
-   API basics, request–response cycle, endpoints, documentation, Fetch, GET/POST/PUT/DELETE, Response objects, AJAX, XML vs JSON, `response.json()`, Promises, async/await, status codes, headers, debugging, and practice.
+1. [Fetch API concepts](fetch-api-notes.md) — API request/response, public API examples, Cat Facts API, Fetch, Promises, Response object, JSON parsing, HTTP methods, status codes, headers, and the POST-request homework.
+2. [Currency Converter walkthrough](currency-converter/README.md) — the HTML/CSS layout, currency dropdowns, country/flag mapping, exchange-rate API, form event, amount validation, calculation, result message, and page-load update.
 
-2. **[Currency Converter — Detailed Project Walkthrough](currency-converter/README.md)**  
-   Project structure, HTML form, CSS layout, currency dropdowns, country/flag mapping, DOM events, preventing form reload, amount validation, building the API endpoint, parsing exchange-rate JSON, calculation, displaying results, common bugs, and practice tasks.
+## Lesson sequence
 
-## Suggested learning order
+| Video time | What the lecture covers |
+| --- | --- |
+| 0:00–0:51 | Final chapter introduction and Currency Converter project preview |
+| 1:00–5:55 | API recap, request/response cycle, restaurant/recipe analogies, public API directories |
+| 5:55–9:39 | Cat Facts API documentation and first Fetch request |
+| 9:39–25:57 | Promise state, async/await, Response object, JSON, Promise chaining |
+| 26:05–31:54 | HTTP methods, status codes, headers, POST-request homework |
+| 32:14–52:55 | Currency Converter HTML and CSS, then JavaScript/data files |
+| 53:03–1:02:46 | Currency API, dropdown population, default currencies, flag updates |
+| 1:02:55–1:08:55 | Button event, amount validation, building the request, receiving the response |
+| 1:08:55–1:17:07 | JSON rate lookup, multiplication, result text, page-load update, conversion tests |
 
-1. Read the Fetch API notes first.
-2. Make a small API request and inspect the Response object.
-3. Parse the response with `response.json()`.
-4. Rebuild the Currency Converter one feature at a time.
-5. Use the debugging checklist and practice tasks to test your understanding.
+## Source-faithfulness note
 
-## Important source note
+The transcript is auto-dubbed and does not reliably preserve every code identifier or full URL. Where the narration explains the logic but the transcript does not expose an exact literal, the notes label the code as a reconstruction or use a placeholder. Those parts should not be mistaken for a verbatim copy of the instructor's source files.
 
-The supplied transcript describes the lesson and some of its implementation decisions, but does not include every original source file or guarantee that its sample API is still available. Where an exact endpoint, mapping file, or response shape is not established by the transcript, the notes clearly mark it as API-specific instead of inventing it.
-
-## Original lesson
-
-*Last Lecture: Fetch API with Project | JavaScript Full Course* — Shradha Khapra (video date shown in the supplied transcript: December 15, 2023).
+No unrelated Fetch patterns, extra exercises, or modern best-practice sections are included as if they were taught in this lecture.
